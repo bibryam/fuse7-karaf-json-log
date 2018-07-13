@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="              http://maven.apache.org/POM/4.0.0              http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.ofbizian</groupId>
+  <artifactId>fuse7-karaf-json-log</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+  <name>Fabric8 :: Quickstarts :: Karaf :: Camel Log</name>
+  <description>A simple Camel route in Karaf container</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- configure the versions you want to use here -->
+    <fabric8.version>3.0.11.fuse-000039-redhat-1</fabric8.version>
+    <karaf.plugin.version>4.2.0.fuse-000237-redhat-1</karaf.plugin.version>
+
+    <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+    <maven-bundle-plugin.version>2.3.7</maven-bundle-plugin.version>
+    <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+    <fabric8.maven.plugin.version>3.5.33.fuse-000067-redhat-1</fabric8.maven.plugin.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- import fabric8 platform bom first -->
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>fabric8-project-bom-fuse-karaf</artifactId>
+        <version>${fabric8.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- camel -->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-blueprint</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Karaf microcontainer dependencies -->
+    <dependency>
+      <!-- scope is compile so all features (there is only one) are installed into startup.properties,
+      and the feature repo itself is not added in etc/org.apache.karaf.features.cfg file -->
+      <groupId>org.jboss.fuse</groupId>
+      <artifactId>fuse-karaf-framework</artifactId>
+      <type>kar</type>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>fabric8-karaf-features</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <defaultGoal>install</defaultGoal>
+
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${maven-bundle-plugin.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>${maven-install-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>default-install</id>
+            <goals>
+              <goal>install</goal>
+            </goals>
+            <phase>install</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <version>${karaf.plugin.version}</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>karaf-assembly</id>
+            <goals>
+              <goal>assembly</goal>
+            </goals>
+            <phase>install</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <javase>1.8</javase>
+          <karafVersion>v4x</karafVersion>
+          <framework>framework</framework>
+          <useReferenceUrls>true</useReferenceUrls>
+          <archiveTarGz>false</archiveTarGz>
+          <includeBuildOutputDirectory>false</includeBuildOutputDirectory>
+          <startupFeatures>
+            <feature>framework</feature>
+            <feature>jaas</feature>
+            <feature>log</feature>
+            <feature>shell</feature>
+            <feature>management</feature>
+            <feature>aries-blueprint</feature>
+            <feature>camel-blueprint</feature>
+            <feature>fabric8-karaf-blueprint</feature>
+            <feature>fabric8-karaf-checks</feature>
+          </startupFeatures>
+          <startupBundles>
+            <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+          </startupBundles>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>fabric8-maven-plugin</artifactId>
+        <version>${fabric8.maven.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>generate-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>resource</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>build-image</id>
+            <phase>install</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
