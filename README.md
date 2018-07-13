@@ -1,38 +1,40 @@
-# Karaf Camel Log QuickStart
+# Karaf Camel and JSON logging for EFK
 
-This quickstart shows a simple Apache Camel application that logs a message to the server log every 5th second.
+This example demonstrates how you can use Apache Camel with Karaf and log in JSON for EFK
 
-This example is implemented using solely the XML DSL (there is no Java code). The source code is provided in the following XML file `src/main/resources/OSGI-INF/blueprint/camel-log.xml`.
-It also shows how Karaf assembly files can be overridden using resources from `src/main/resources/assembly/`. The included sample log file `etc/org.ops4j.pax.logging.cfg` sets the log level to DEBUG.
+### Code generation
+Project is generated with the command:
 
+    mvn org.apache.maven.plugins:maven-archetype-plugin:2.4:generate \
+      -DarchetypeCatalog=https://maven.repository.redhat.com/earlyaccess/all/io/fabric8/archetypes/archetypes-catalog/2.2.0.fuse-000092-redhat-2/archetypes-catalog-2.2.0.fuse-000092-redhat-2-archetype-catalog.xml \
+      -DarchetypeGroupId=org.jboss.fuse.fis.archetypes \
+      -DarchetypeArtifactId=karaf-camel-log-archetype \
+      -DarchetypeVersion=2.2.0.fuse-000092-redhat-2
+
+
+### Configuration
+Change the start level from 30 to 8 for the following bundles in startup.properties 
+
+    reference\:file\:com/fasterxml/jackson/core/jackson-annotations/2.8.11/jackson-annotations-2.8.11.jar = 8
+    reference\:file\:com/fasterxml/jackson/core/jackson-core/2.8.11/jackson-core-2.8.11.jar = 8
+    reference\:file\:com/fasterxml/jackson/core/jackson-databind/2.8.11.1/jackson-databind-2.8.11.1.jar = 8
+
+In org.ops4j.pax.logging.cfg file, change the logging configuration from 
+
+    log4j2.appender.console.layout.type = PatternLayout
+    log4j2.appender.console.layout.pattern = %d{DEFAULT} | %-5.5p | %-20.20t | %-32.32c{1.} | %X{bundle.id} - %X{bundle.name} - %X{bundle.version} | %m%n
+    log4j2.appender.console.layout.pattern = %d{ABSOLUTE} %-5.5p {%t} [%C.%M()] (%F:%L) : %m%n
+
+to
+
+    log4j2.appender.console.layout.type = JsonLayout
 
 ### Building
-
 The example can be built with
 
-    mvn clean install
-
-
-### Running the example in OpenShift
-
-It is assumed that:
-- OpenShift platform is already running, if not you can find details how to [Install OpenShift at your site](https://docs.openshift.com/container-platform/3.3/install_config/index.html).
-- Your system is configured for Fabric8 Maven Workflow, if not you can find a [Get Started Guide](https://access.redhat.com/documentation/en/red-hat-jboss-middleware-for-openshift/3/single/red-hat-jboss-fuse-integration-services-20-for-openshift/)
-
-The example can be built and deployed using:
-
+    mvn clean install    
     mvn fabric8:deploy
-
-When the example runs in fabric8, you can use the OpenShift client tool to inspect the status
-
-To list all the running pods:
-
     oc get pods
-
-Then find the name of the pod that runs this quickstart, and output the logs from the running pods with:
-
     oc logs <name of pod>
-
-You can also use the openshift [web console](https://docs.openshift.com/container-platform/3.3/getting_started/developers_console.html#developers-console-video) to manage the running pods, and view logs and much more.
 
 
