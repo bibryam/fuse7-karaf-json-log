@@ -38,7 +38,8 @@ The example can be built with
     oc logs <name of pod>
 
 ### Run locally
-target/assembly/bin/fuse
-tail -f target/assembly/data/log/karaf.log
+    target/assembly/bin/fuse
+
+    tail -f target/assembly/data/log/karaf.log
 
  
